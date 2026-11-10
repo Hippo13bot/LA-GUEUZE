@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#11110f">
+  <meta name="description" content="LA GUEUZE — Tout le tournage. Dans ta poche.">
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./assets/icon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="./styles.css">
+  <title>LA GUEUZE — by @hipo.reporter</title>
+</head>
+<body>
+  <div class="app-shell">
+    <aside class="sidebar">
+      <a class="brand" href="#" data-page="today" aria-label="LA GUEUZE accueil">
+        <span class="brand-mark">G.</span>
+        <span><strong>LA GUEUZE</strong><small>PRODUCTION DESK</small></span>
+      </a>
+      <div class="workspace-label">ESPACE DE TRAVAIL</div>
+      <nav id="side-nav" class="side-nav">
+        <button class="nav-item active" data-page="today"><span class="nav-icon">◷</span>Aujourd’hui</button>
+        <button class="nav-item" data-page="productions"><span class="nav-icon">▦</span>Productions</button>
+        <button class="nav-item" data-page="callsheets"><span class="nav-icon">▤</span>Feuilles de service</button>
+        <button class="nav-item" data-page="team"><span class="nav-icon">♙</span>Équipe & contacts</button>
+        <button class="nav-item" data-page="locations"><span class="nav-icon">⌖</span>Lieux & accès</button>
+        <button class="nav-item" data-page="radios"><span class="nav-icon">⌁</span>Talkies-walkies</button>
+        <button class="nav-item" data-page="equipment"><span class="nav-icon">▣</span>Matériel</button>
+      </nav>
+      <div class="sidebar-bottom">
+        <button class="nav-item" data-page="assistant"><span class="nav-icon">✳</span>Le Stagiaire <span class="soon">IA</span></button>
+        <button class="nav-item" data-page="settings"><span class="nav-icon">⚙</span>Réglages</button>
+        <div class="user-card">
+          <div class="avatar">H</div><div><strong>Mode aperçu</strong><small>Prototype local</small></div>
+          <span class="status-dot"></span>
+        </div>
+        <div class="signature">by @hipo.reporter</div>
+      </div>
+    </aside>
+
+    <main class="main-area">
+      <header class="topbar">
+        <div class="mobile-brand"><span class="brand-mark">G.</span><strong>LA GUEUZE</strong></div>
+        <div class="breadcrumb"><span>ESPACE DE TRAVAIL</span><b>/</b><strong id="page-crumb">AUJOURD’HUI</strong></div>
+        <div class="top-actions">
+          <span class="sync-pill"><i></i> Données sur cet appareil</span>
+          <button class="icon-button" id="export-btn" title="Exporter les données">⇩</button>
+          <button class="primary-button" id="quick-add">＋ <span>Créer</span></button>
+        </div>
+      </header>
+      <section id="view" class="view" aria-live="polite"></section>
+      <footer class="mobile-footer" id="mobile-nav">
+        <button class="active" data-page="today"><span>◷</span>Aujourd’hui</button>
+        <button data-page="productions"><span>▦</span>Productions</button>
+        <button data-page="callsheets"><span>▤</span>Feuilles</button>
+        <button data-page="team"><span>♙</span>Équipe</button>
+        <button data-page="settings"><span>•••</span>Plus</button>
+      </footer>
+    </main>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+  <dialog id="modal" class="modal"><form method="dialog" id="modal-form"><button class="modal-close" value="cancel" aria-label="Fermer">×</button><div id="modal-content"></div></form></dialog>
+  <script src="./app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+      window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(() => {}));
+    }
+  </script>
+</body>
+</html>
