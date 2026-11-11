@@ -5,3 +5,6 @@ window.GUEUZE_CONFIG = {
   supabaseAnonKey: "sb_publishable_IUxD5ITMlfEysXfD-ynsfg_8E-8mqVa",
   projectRef: "zbfwjeolxntgpfxyfryn"
 };
+valeurs :
+caverneUrl: "https://cpczqpyiizlbowesdkig.supabase.co/rest/v1/",
+caverneAnonKey: "sb_publishable_Dmn-pyyS2z6RNWcLFr3Yvw_MhACMpYN",
