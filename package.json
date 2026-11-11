@@ -1,0 +1,49 @@
+{
+  "name": "la-gueuze",
+  "version": "2.0.0",
+  "private": true,
+  "description": "LA GUEUZE — Tout le tournage. Dans ta poche.",
+  "main": "desktop/main.cjs",
+  "scripts": {
+    "desktop": "electron .",
+    "dist": "electron-builder"
+  },
+  "devDependencies": {
+    "electron": "^39.0.0",
+    "electron-builder": "^26.0.12"
+  },
+  "build": {
+    "appId": "reporter.hipo.lagueuze",
+    "productName": "LA GUEUZE",
+    "files": [
+      "index.html",
+      "app.js",
+      "styles.css",
+      "manifest.webmanifest",
+      "sw.js",
+      "portal.html",
+      "assets/**/*",
+      "desktop/**/*"
+    ],
+    "directories": {
+      "output": "release"
+    },
+    "mac": {
+      "target": [
+        "dmg",
+        "zip"
+      ],
+      "category": "public.app-category.video"
+    },
+    "win": {
+      "target": [
+        "nsis",
+        "portable"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
+  }
+}
