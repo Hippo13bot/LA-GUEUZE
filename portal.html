@@ -1,13 +1,10 @@
-<!doctype html>
-<html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="theme-color" content="#11110f"><title>Accès production — LA GUEUZE</title>
-<link rel="stylesheet" href="./styles.css"><link rel="icon" href="./assets/icon.svg"></head>
-<body><main style="max-width:680px;margin:8vh auto;padding:28px">
-<img src="./assets/gueuze-identity.gif" alt="LA GUEUZE" style="width:180px;max-width:50%;border-radius:12px">
-<p class="eyebrow" style="margin-top:28px">PORTAIL DE PRODUCTION</p><h1>Accès aux informations du tournage</h1>
-<p>Ce lien QR identifie une demande d’accès, mais ne donne pas directement accès aux données de production.</p>
-<section class="panel" style="margin-top:24px"><h2>Authentification requise</h2>
-<p>Connecte-toi avec un compte autorisé par l’équipe de production. Aucun document, contact ou horaire privé n’est affiché sur cette page sans contrôle serveur.</p>
-<p class="subtle">Le portail sécurisé sera activé après configuration de l’authentification HIPPO CORE et des fonctions de validation des jetons QR.</p>
-<a class="primary-button" href="./">Retour à LA GUEUZE</a></section>
-<div class="signature" style="margin-top:30px">by @hipo.reporter</div></main></body></html>
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><meta name="referrer" content="no-referrer">
+<title>LA GUEUZE — Portail</title><link rel="stylesheet" href="styles.css"></head><body><div class="wrap" id="p"><p class="muted">Vérification du lien…</p></div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script><script src="config/supabase.js"></script>
+<script>(async()=>{const p=document.getElementById('p'),e=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const c=window.GUEUZE_CONFIG,t=location.hash.slice(1);
+if(!c||!t){p.innerHTML='<p class="err">Lien invalide.</p>';return}
+const {data,error}=await supabase.createClient(c.supabaseUrl,c.supabaseAnonKey,{auth:{persistSession:false}}).rpc('gueuze_qr_open',{tok:t});
+if(error||!data){p.innerHTML='<p class="err">Lien expiré, révoqué ou invalide. Demande un nouveau QR à la production.</p>';return}
+p.innerHTML=`<p class="sig">LA GUEUZE · by @hipo.reporter</p><h1>${e(data.production)}</h1><p class="muted">Accès temporaire — valable jusqu’au ${new Date(data.expires_at).toLocaleString('fr-FR')}</p>`+
+(data.sheets.map(s=>{const k=s.content||{};return `<div class="card"><b>${e(s.shoot_date)} ${e(s.title)}</b>Convocation : ${e(k.call)||'—'}<br>Lieu : ${e(k.place)||'—'}<pre style="white-space:pre-wrap;font:inherit">${e(k.scenes)}</pre><i class="muted">${e(k.notes)}</i></div>`}).join('')||'<p class="muted">Aucune feuille publiée.</p>')})()</script></body></html>
