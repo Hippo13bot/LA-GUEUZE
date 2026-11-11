@@ -43,12 +43,6 @@ function sheetForm(s,ed){const c=s.content||{};const d=ed||!s.id;const dis=d?'':
  <input id="sl" placeholder="Lieu / adresse" value="${esc(c.place)}" ${dis}><textarea id="ss" rows="5" placeholder="Scènes, horaires, comédiens, techniciens, transport…" ${dis}>${esc(c.scenes)}</textarea>
  <textarea id="sn" rows="3" placeholder="Consignes particulières" ${dis}>${esc(c.notes)}</textarea>
  ${d?`<div class="row"><button data-a="savesheet">Enregistrer</button>${s.id&&s.status==='draft'?'<button class="g" data-a="stat" data-v="validated">Valider</button>':''}${s.id&&s.status!=='published'&&s.status==='validated'?'<button data-a="stat" data-v="published">Publier</button>':''}${s.id&&s.status!=='draft'?'<button class="g" data-a="stat" data-v="draft">Repasser en brouillon</button>':''}${s.id?'<button class="d" data-a="delsheet">Supprimer</button>':''}</div>`:''}`}
-const _pv=prodView;
-prodView=function(){const tabs=[['sheets','Feuilles & équipe'],['location','Lieux'],['contact','Annuaire'],['radio','Talkies'],['equipment','Matériel'],['docs','Documents'],['qr','QR']];
- const bar=`<div class="row tabs">${tabs.map(([k,l])=>`<button class="${S.pt===k?'':'g'}" data-a="pt" data-v="${k}">${l}</button>`).join('')}</div>`;
- if(S.pt==='sheets')return _pv().replace('</h2><p>','</h2>'+bar+'<p>').replace('<h2>Équipe</h2>',(GX.ext?GX.ext.pdfBlock():'')+'<h2>Équipe</h2>');
- return head()+`<div class="wrap"><button class="g" data-a="back">← Productions</button><h2>${esc(S.cur.name)}</h2>${bar}<p>${S.msg}</p>${GX.ext.view(S.pt)}</div>`};
-window.GX={S,sb,esc,val,run,say,render,A,canEdit,myRole};
 function render(){app.innerHTML=!S.user?authView():S.cur?prodView():listView()}
 const val=id=>document.getElementById(id)?.value.trim()||'';
 const readSheet=()=>({shoot_date:val('sd'),title:val('st'),content:{call:val('sc'),place:val('sl'),scenes:val('ss'),notes:val('sn')}});
@@ -79,6 +73,12 @@ addEventListener('online',refresh);addEventListener('offline',render);document.a
 sb.auth.onAuthStateChange(async(ev,ses)=>{if(ev==='PASSWORD_RECOVERY'){S.recovery=true;S.user=ses?.user||null;return render()}
  if(ses?.user&&!S.recovery){const first=!S.user;S.user=ses.user;if(first){try{await loadProds();subscribe()}catch(e){say('Lecture impossible : migration non exécutée ? '+e.message,1)}}}
  else if(!ses){S.user=null}render()});
+const _pv=prodView;
+prodView=function(){const tabs=[['sheets','Feuilles & équipe'],['location','Lieux'],['contact','Annuaire'],['radio','Talkies'],['equipment','Matériel'],['docs','Documents'],['qr','QR']];
+ const bar=`<div class="row tabs">${tabs.map(([k,l])=>`<button class="${S.pt===k?'':'g'}" data-a="pt" data-v="${k}">${l}</button>`).join('')}</div>`;
+ if(S.pt==='sheets')return _pv().replace('</h2><p>','</h2>'+bar+'<p>').replace('<h2>Équipe</h2>',(GX.ext?GX.ext.pdfBlock():'')+'<h2>Équipe</h2>');
+ return head()+`<div class="wrap"><button class="g" data-a="back">← Productions</button><h2>${esc(S.cur.name)}</h2>${bar}<p>${S.msg}</p>${GX.ext.view(S.pt)}</div>`};
+window.GX={S,sb,esc,val,run,say,render,A,canEdit,myRole};
 render();
 if('serviceWorker'in navigator)navigator.serviceWorker.register('sw.js').catch(()=>{});
 })();
