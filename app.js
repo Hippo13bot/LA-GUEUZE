@@ -35,7 +35,7 @@ function prodView(){const p=S.cur,ed=canEdit(),sh=S.sheet;
  <h2>Feuilles de service</h2>${S.sheets.map(s=>`<div class="card" data-a="sheet" data-id="${s.id}"><b>${s.shoot_date} ${esc(s.title)}</b><span class="tag ${s.status}">${ST[s.status]}</span> <span class="muted">v${s.version}</span></div>`).join('')||'<p class="muted">Aucune feuille visible.</p>'}
  ${['owner','admin','dept_head'].includes(myRole())?`<button data-a="newsheet">+ Nouvelle feuille</button>`:''}
  ${sh?sheetForm(sh,ed):''}
- <h2>Équipe</h2>${S.mem.map(m=>`<div class="card"><b>${esc(m.user_id.slice(0,8))}…</b><span class="muted">${RL[m.role]} ${esc(m.department)}</span></div>`).join('')}
+ <h2>Équipe</h2>${S.mem.map(m=>`<div class="card"><b>${esc(m.user_id.slice(0,8))}…</b><span class="muted">${RL[m.role]} ${esc(m.department)}</span> ${canEdit()&&m.role!=='owner'?`<button class="d" data-a="delmem" data-id="${m.user_id}">Retirer</button>`:''}</div>`).join('')}
  ${ed?`<div class="row"><input id="me" type="email" placeholder="E-mail d’un compte existant"><select id="mr"><option value="crew">Équipe</option><option value="dept_head">Chef de poste</option><option value="admin">Admin</option><option value="viewer">Lecture</option></select><input id="md" placeholder="Département"><button data-a="addmem">Ajouter</button></div>`:''}</div>`}
 function sheetForm(s,ed){const c=s.content||{};const d=ed||!s.id;const dis=d?'':'disabled';
  return `<h2>${s.id?'Feuille v'+s.version:'Nouvelle feuille'}${s.status?` <span class="tag ${s.status}">${ST[s.status]}</span>`:''}</h2>
@@ -73,10 +73,18 @@ addEventListener('online',refresh);addEventListener('offline',render);document.a
 sb.auth.onAuthStateChange(async(ev,ses)=>{if(ev==='PASSWORD_RECOVERY'){S.recovery=true;S.user=ses?.user||null;return render()}
  if(ses?.user&&!S.recovery){const first=!S.user;S.user=ses.user;if(first){try{await loadProds();subscribe()}catch(e){say('Lecture impossible : migration non exécutée ? '+e.message,1)}}}
  else if(!ses){S.user=null}render()});
+Object.assign(A,{
+ async saveprod(){const n=val('en');if(!n)return say('Le nom est obligatoire.',1),render();
+  await run(async()=>{const r=await sb.from('gueuze_productions').update({name:n,start_date:val('es')||null,end_date:val('ee')||null,status:val('est')}).eq('id',S.cur.id);if(r.error)return r;await loadProds();S.cur=S.prods.find(p=>p.id===S.cur.id)},'Production modifiée.')},
+ async delprod(){if(!confirm('Supprimer la production « '+S.cur.name+' » ? Elle disparaîtra de la liste pour toute l’équipe (les données restent archivées côté base).'))return;
+  await run(async()=>{const r=await sb.from('gueuze_productions').update({deleted_at:new Date().toISOString()}).eq('id',S.cur.id);if(r.error)return r;S.cur=null;S.sheet=null;await loadProds()},'Production supprimée.')},
+ async delmem(e){if(!confirm('Retirer ce membre de la production ?'))return;
+  await run(async()=>{const r=await sb.from('gueuze_memberships').delete().eq('production_id',S.cur.id).eq('user_id',e.dataset.id);if(r.error)return r;await loadCur()},'Membre retiré.')}});
+const mgmt=()=>canEdit()?`<h2>Production</h2><input id="en" value="${esc(S.cur.name)}"><div class="row"><input id="es" type="date" value="${S.cur.start_date||''}"><input id="ee" type="date" value="${S.cur.end_date||''}"><select id="est">${['preparation','tournage','post','archivee'].map(x=>`<option ${x===S.cur.status?'selected':''}>${x}</option>`).join('')}</select></div><div class="row"><button data-a="saveprod">Enregistrer</button><button class="d" data-a="delprod">Supprimer la production</button></div>`:'';
 const _pv=prodView;
 prodView=function(){const tabs=[['sheets','Feuilles & équipe'],['location','Lieux'],['contact','Annuaire'],['radio','Talkies'],['equipment','Matériel'],['docs','Documents'],['qr','QR']];
  const bar=`<div class="row tabs">${tabs.map(([k,l])=>`<button class="${S.pt===k?'':'g'}" data-a="pt" data-v="${k}">${l}</button>`).join('')}</div>`;
- if(S.pt==='sheets')return _pv().replace('</h2><p>','</h2>'+bar+'<p>').replace('<h2>Équipe</h2>',(GX.ext?GX.ext.pdfBlock():'')+'<h2>Équipe</h2>');
+ if(S.pt==='sheets')return _pv().replace('</h2><p>','</h2>'+bar+'<p>').replace('<h2>Équipe</h2>',(GX.ext?GX.ext.pdfBlock():'')+'<h2>Équipe</h2>').replace(/<\/div>\s*$/,mgmt()+'</div>');
  return head()+`<div class="wrap"><button class="g" data-a="back">← Productions</button><h2>${esc(S.cur.name)}</h2>${bar}<p>${S.msg}</p>${GX.ext.view(S.pt)}</div>`};
 window.GX={S,sb,esc,val,run,say,render,A,canEdit,myRole};
 render();
