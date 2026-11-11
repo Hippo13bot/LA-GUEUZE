@@ -1,0 +1,29 @@
+name: Construire les applications Mac et Windows
+on:
+  workflow_dispatch:
+  push:
+    tags: ['v*']
+permissions:
+  contents: write
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: macos-latest
+            platform: mac
+          - os: windows-latest
+            platform: win
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm install
+      - run: npm run dist -- --${{ matrix.platform }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: la-gueuze-${{ matrix.platform }}
+          path: release/*
