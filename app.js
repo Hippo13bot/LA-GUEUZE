@@ -8,7 +8,8 @@ if(!cfg||!cfg.supabaseAnonKey||/REMPLACER/.test(cfg.supabaseAnonKey)){
  app.innerHTML='<div class="login"><h1>LA GUEUZE</h1><p class="err">Configuration manquante : copie config/supabase.example.js en config/supabase.js et renseigne la clé publishable (voir README).</p></div>';return}
 const sb=supabase.createClient(cfg.supabaseUrl,cfg.supabaseAnonKey,{auth:{persistSession:true,autoRefreshToken:true,detectSessionInUrl:true}});
 const online=()=>navigator.onLine;
-const say=(m,e)=>{S.msg=m?`<span class="${e?'err':'ok'}">${esc(m)}</span>`:'';};
+function toast(m,e){if(!document.body)return;let t=document.getElementById('toast');if(!t){t=document.createElement('div');t.id='toast';document.body.appendChild(t)}if(!m){t.style.display='none';return}t.className=e?'err':'ok';t.textContent=m;t.style.display='block';clearTimeout(toast.h);toast.h=setTimeout(()=>{t.style.display='none'},7000)}
+const say=(m,e)=>{toast(m,e);S.msg=m?`<span class="${e?'err':'ok'}">${esc(m)}</span>`:'';};
 async function run(fn,okMsg){ if(!online()){say('Hors connexion : modification impossible, rien n’a été enregistré.',1);return render()}
  try{const r=await fn();if(r&&r.error)throw r.error;if(okMsg)say(okMsg);S.last=new Date();return r}catch(e){say(e.message==='no_account'?'Aucun compte existant avec cet e-mail.':'Erreur : '+(e.message||e),1)}finally{render()}}
 async function loadProds(){const{data,error}=await sb.from('gueuze_productions').select('*').is('deleted_at',null).order('created_at',{ascending:false});if(error)throw error;S.prods=data;S.last=new Date()}
@@ -57,7 +58,7 @@ const A={
  async open(e){await run(()=>openProd(e.dataset.id))},
  back(){S.cur=null;S.sheet=null;S.msg='';render()},
  async newprod(){if(!val('pn'))return say('Donne un nom à la production.',1),render();
-  await run(async()=>{const r=await sb.from('gueuze_productions').insert({name:val('pn'),start_date:val('ps')||null,end_date:val('pe')||null});if(r.error)return r;await loadProds()},'Production créée.')},
+  await run(async()=>{const r=await sb.from('gueuze_productions').insert({name:val('pn'),start_date:val('ps')||null,end_date:val('pe')||null});if(r.error)return r;await loadProds()},'Production créée.');scrollTo(0,0)},
  newsheet(){S.sheet={content:{}};render()},
  sheet(e){S.sheet=S.sheets.find(s=>s.id===e.dataset.id);render()},
  async savesheet(){const v=readSheet();if(!v.shoot_date)return say('La date de tournage est obligatoire.',1),render();

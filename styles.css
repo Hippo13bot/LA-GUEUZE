@@ -11,3 +11,4 @@ button{width:auto;cursor:pointer;background:var(--a);border:0;color:#111;font-we
 .bar{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 16px;border-bottom:1px solid var(--l);font-size:13px}.err{color:var(--er)}.ok{color:var(--ok)}
 @media print{.bar,button,.tabs,input,select,.row{display:none!important}body{background:#fff;color:#000}.card{border:1px solid #999;background:#fff}}
 .tabs button{padding:6px 10px;font-size:13px}
+#toast{position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom));background:var(--p);border:1px solid var(--l);border-radius:12px;padding:12px;z-index:9;display:none;font-weight:600}
