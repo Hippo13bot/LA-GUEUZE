@@ -1,23 +1,46 @@
-# LA GUEUZE V3 — lot 1 (cœur)
+# LA GUEUZE V3
 *Tout le tournage. Dans ta poche.* — by @hipo.reporter
 
-## Contenu du lot 1
-Authentification Supabase (inscription, connexion, déconnexion, mot de passe oublié, session persistante), productions, équipe et rôles (ajout d'un compte **existant** par e-mail), feuilles de service manuelles (brouillon → validée → publiée, historique des versions, journal), synchronisation en direct (Realtime) avec indicateur de dernière synchro, PWA, RLS.
-**Pas encore (lots 2 et 3)** : import PDF, lieux/cartes, annuaire Répertoire, matériel Caverne, documents, talkies, portail QR, builds desktop validés, manuel PDF. Pas d'IA (Le Stagiaire retiré).
+## Configuration actuellement déployée
 
-## Mise en route (5 étapes)
-1. **Supabase** → SQL Editor → colle et exécute `supabase/migrations/202611110002_gueuze_lot1.sql` (additif, ne touche à aucune table existante).
-2. Supabase → Project Settings → API : copie l'URL et la clé **publishable/anon** (jamais la `service_role`).
-3. Copie `config/supabase.example.js` en `config/supabase.js` et colle la clé. Ce fichier est public par nature, c'est normal.
-4. Supabase → Authentication → URL Configuration : ajoute `https://hippo13bot.github.io/LA-GUEUZE/` dans *Site URL* et *Redirect URLs* (sinon les liens e-mail de confirmation et de mot de passe oublié échouent).
-5. GitHub : dépose les fichiers dans `Hippo13bot/LA-GUEUZE`, Settings → Pages → Source : *GitHub Actions*. Le site est publié par `pages.yml` (seuls les fichiers publics sont déployés).
+LA GUEUZE est reconnectée au projet Supabase existant **hippomoamias@gmail.com's Project** (référence `cpczqpyiizlbowesdkig`). Aucun nouveau projet n'a été créé.
 
-Sur iPhone : ouvrir l'URL dans Safari → Partager → *Sur l'écran d'accueil*.
+Le schéma LA GUEUZE utilise uniquement des tables préfixées `gueuze_*`. Les tables `caverne_*` existantes sont conservées et ne sont ni renommées ni modifiées par les migrations LA GUEUZE. La table `caverne_public_catalog` est utilisée en lecture seule par l'onglet Matériel.
 
-## Sécurité
-Aucune clé secrète dans le code. RLS activé sur toutes les tables `gueuze_*`. Les droits sont vérifiés côté base : seuls propriétaire/admin modifient, publient ou gèrent l'équipe ; l'équipe ne voit que les feuilles **publiées**.
+La migration autonome a été installée directement sur le projet : productions, membres et rôles, feuilles de service, historique, journal, lieux, contacts, talkies, matériel, QR temporaires et stockage privé. Les tables LA GUEUZE ont RLS activé ; les accès anonymes aux tables sont révoqués. Le RPC du portail QR reste accessible anonymement pour afficher uniquement les feuilles publiées via un jeton valide.
 
-## Lots 2 et 3 (migration `202611110003_gueuze_lot2_3.sql`, à exécuter après la 0002)
-Lieux (liens Plans / Google Maps), annuaire, talkies, matériel (catalogue La Caverne en lecture + liste de souhaits), documents (stockage privé), import PDF assisté (texte uniquement, jamais publié sans validation), impression/export PDF, portail QR (`portal.html`, jetons à durée limitée, révocables, validés côté serveur).
-**Limites connues** : pas d'OCR pour les scans ; la réservation réelle dans La Caverne n'est pas automatisée (fonction serveur de La Caverne inconnue) ; l'annuaire n'est pas encore synchronisé avec Répertoire ; builds Mac/Windows non testés ; le QR donne accès aux feuilles publiées sans connexion ; pas d'IA.
-**Bureau** : onglet Actions de GitHub → « desktop » → Run workflow ; les installateurs sont dans les artefacts. Non signés : Mac demande clic droit → Ouvrir, Windows affiche SmartScreen.
+## Authentification
+
+Les comptes Supabase Auth de ce projet sont communs aux applications qui utilisent ce même projet, notamment La Caverne. Connecte-toi avec un compte déjà existant dans ce projet, ou crée un compte si nécessaire.
+
+Dans Supabase → Authentication → URL Configuration, vérifie que l'URL du site et les Redirect URLs autorisent :
+`https://hippo13bot.github.io/LA-GUEUZE/`
+
+Ne publie jamais de clé `service_role`. La clé publishable présente dans `config/supabase.js` est une clé publique destinée au navigateur.
+
+## Fonctionnalités
+
+- Authentification : inscription, connexion, déconnexion, réinitialisation du mot de passe.
+- Productions, rôles et gestion d'équipe (ajout d'un compte existant par e-mail).
+- Feuilles de service : brouillon, validation, publication et historique des versions.
+- Synchronisation en direct et PWA.
+- Lieux et cartes, annuaire, talkies, matériel (catalogue La Caverne en lecture + liste de souhaits).
+- Documents dans un bucket privé.
+- Import PDF assisté (texte uniquement, à vérifier avant publication), impression/export PDF.
+- QR temporaires, révocables, avec accès public limité aux feuilles publiées.
+
+## Déploiement
+
+Le site est publié par GitHub Actions / GitHub Pages depuis `main` :
+https://hippo13bot.github.io/LA-GUEUZE/
+
+Sur iPhone : ouvrir l'URL dans Safari → Partager → Sur l'écran d'accueil.
+
+## Limites connues
+
+- Pas d'OCR pour les scans PDF.
+- La réservation réelle du matériel dans La Caverne n'est pas automatisée : l'onglet LA GUEUZE crée une liste de souhaits.
+- L'annuaire n'est pas synchronisé avec Répertoire.
+- Builds Mac/Windows à revalider après les prochaines évolutions.
+- Les QR donnent accès aux feuilles publiées sans connexion, jamais à l'annuaire ni aux documents.
+- Pas d'IA.
